@@ -1,0 +1,22 @@
+{
+  "name": "natours_node_express_practice",
+  "version": "1.0.0",
+  "description": "Project to revisit node and express. Practice.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmmarketing/natours-nodejs-express.git"
+  },
+  "author": "Jeff McLean",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jmmarketing/natours-nodejs-express/issues"
+  },
+  "homepage": "https://github.com/jmmarketing/natours-nodejs-express.git/#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
