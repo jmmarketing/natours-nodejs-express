@@ -1,0 +1,45 @@
+const express = require('express');
+const fs = require('fs');
+
+const app = express();
+const port = 3000;
+
+// app.get('/', (req, res) => {
+//   //   res.status(200).send('Hello from the server!');
+//   res.status(200).json({ message: 'Hello from the server', app: 'Natours' });
+// });
+
+// app.post('/', (req, res) => {
+//   res.send('You can send to this Post');
+// });
+
+// const toursData = fs.createReadStream(`${__dirname}/dev-data/data/tours.json`);
+
+// #####################
+// ### GET REQUEST #####
+// #####################
+const toursData = JSON.parse(
+  fs.readFileSync(`${__dirname}/dev-data/data/tours.json`)
+);
+
+app.get('/api/v1/tours', (req, res) => {
+  res.status(200).json({
+    // Using JSend formatting
+    status: 'success',
+    results: toursData.length,
+    data: {
+      tours: toursData,
+    },
+  });
+});
+
+// ######################
+// ### POST REQUEST #####
+// ######################
+
+// #####################
+// ### LISTENING  ######
+// #####################
+app.listen(port, () => {
+  console.log(`Running on port: ${port}`);
+});
