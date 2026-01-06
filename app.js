@@ -36,6 +36,34 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
+// GET Request with URL Parameters
+// {/:y} - Express v5+ updated optional paramaters
+//:id parameter declaration
+app.get('/api/v1/tours/:id{/:y}', (req, res) => {
+  //Parameters accessible in req.params
+  const paramID = +req.params.id;
+
+  //Error catch
+  if (paramID > toursData.length) {
+    return res
+      .status(404)
+      .json({ status: 'fail', message: 'Invalid tour ID.' });
+  }
+
+  // Find tour with ID
+  const tour = toursData.find((t) => t.id == paramID);
+
+  //Success
+  console.log(tour);
+  res.status(200).json({
+    // Using JSend formatting
+    status: 'success',
+    data: {
+      tours: tour,
+    },
+  });
+});
+
 // ######################
 // ### POST REQUEST #####
 // ######################
@@ -44,7 +72,7 @@ app.post('/api/v1/tours', (req, res) => {
   //By default express does not include the data with the request. Need middleware. (see above).
   //   console.log(req.body);
   const newId = toursData[toursData.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
+  const newTour = Object.assign({ id: newId }, req.body); // req.body is only available becasue of above middleware
 
   toursData.push(newTour);
   fs.writeFile(
