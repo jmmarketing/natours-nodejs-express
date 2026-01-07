@@ -84,6 +84,37 @@ app.post('/api/v1/tours', (req, res) => {
   );
 });
 
+// #######################
+// ### PATCH REQUEST #####
+// #######################
+app.patch('/api/v1/tours/:id', (req, res) => {
+  const paramID = +req.params.id;
+  const tour = toursData.find((t) => t.id == paramID);
+  const tourIndex = toursData.findIndex((t) => t.id == paramID);
+
+  console.log(tourIndex);
+
+  //Error catch
+  if (paramID > toursData.length) {
+    return res
+      .status(404)
+      .json({ status: 'fail', message: 'Invalid tour ID.' });
+  }
+
+  // Merge Updates
+  Object.assign(tour, req.body);
+  toursData[tourIndex] = tour;
+
+  // Update File
+  fs.writeFile(
+    `${__dirname}/dev-data/data/tours-simple.json`,
+    JSON.stringify(toursData),
+    (err) => {
+      res.status(201).json({ status: 'success', data: { tour } });
+    }
+  );
+});
+
 // #####################
 // ### LISTENING  ######
 // #####################
