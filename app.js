@@ -1,23 +1,46 @@
 const express = require('express');
 const fs = require('fs');
+const morgan = require('morgan');
 
 const app = express();
-
-app.use(express.json()); //Middleware - Function that can modify incoming request data.
-
 const port = 3000;
 
 const toursData = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
-// +++++++++++++++++++
-// ++++ Callbacks ++++ *Find comments in standard format section*
-// +++++++++++++++++++
+const userData = JSON.parse(
+  fs.readFileSync(`${__dirname}/dev-data/data/users.json`)
+);
 
+// ++++++++++++++++++++
+// ++++ Middleware ++++
+// ++++++++++++++++++++
+app.use(morgan('dev'));
+
+app.use(express.json()); //Middleware - Function that can modify incoming request data.
+
+app.use((req, res, next) => {
+  console.log('Hello from the middlewar 🤭');
+
+  next();
+});
+
+app.use((req, res, next) => {
+  req.requestedTime = new Date().toISOString();
+
+  next();
+});
+
+// ++++++++++++++++++++++++++++++++++
+// ++++ Route Handler Callbacks ++++ *Find comments in standard format section*
+// +++++++++++++++++++++++++++++++++++
+
+// <<<<<<<<< TOUR ROUTES >>>>>>>>>
 const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
+    requestedAt: req.requestedTime,
     results: toursData.length,
     data: {
       tours: toursData,
@@ -102,6 +125,46 @@ const deleteTour = (req, res) => {
   });
 };
 
+// <<<<<<<<< USER ROUTE HANLDERS >>>>>>>>>
+
+const getAllUsers = (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    userCount: userData.length,
+    data: {
+      users: userData,
+    },
+  });
+};
+
+const createUser = (req, res) => {
+  res.status(500).json({
+    status: 'Error',
+    message: 'No Route. Try again later',
+  });
+};
+
+const getUser = (req, res) => {
+  res.status(500).json({
+    status: 'Error',
+    message: 'No Route. Try again later',
+  });
+};
+
+const updateUser = (req, res) => {
+  res.status(500).json({
+    status: 'Error',
+    message: 'No Route. Try again later',
+  });
+};
+
+const deleteUser = (req, res) => {
+  res.status(500).json({
+    status: 'Error',
+    message: 'No Route. Try again later',
+  });
+};
+
 // ****************************
 // *** REFACTORED ROUTING *****
 // ****************************
@@ -124,6 +187,14 @@ app
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
+
+app.route('/api/v1/users').get(getAllUsers).post(createUser);
+
+app
+  .route('/api/v1/users/:id')
+  .get(getUser)
+  .patch(updateUser)
+  .delete(deleteUser);
 
 // ****************************
 // *** STANDARD ROUTING *******
