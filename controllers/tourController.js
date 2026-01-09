@@ -5,6 +5,15 @@ const toursData = JSON.parse(
 );
 
 // <<<<<<<<< TOUR ROUTE HANDLERS/CONTROLLERS >>>>>>>>>
+exports.checkID = (req, res, next, val) => {
+  console.log(`Tour id: ${val}`);
+  if (val > toursData.length) {
+    return res
+      .status(404)
+      .json({ status: 'fail', message: 'Invalid tour ID.' });
+  }
+};
+
 exports.getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -18,12 +27,6 @@ exports.getAllTours = (req, res) => {
 
 exports.getTour = (req, res) => {
   const paramID = +req.params.id;
-
-  if (paramID > toursData.length) {
-    return res
-      .status(404)
-      .json({ status: 'fail', message: 'Invalid tour ID.' });
-  }
 
   const tour = toursData.find((t) => t.id == paramID);
   res.status(200).json({
@@ -53,12 +56,6 @@ exports.updateTour = (req, res) => {
   const tour = toursData.find((t) => t.id == paramID);
   const tourIndex = toursData.findIndex((t) => t.id == paramID);
 
-  if (paramID > toursData.length) {
-    return res
-      .status(404)
-      .json({ status: 'fail', message: 'Invalid tour ID.' });
-  }
-
   Object.assign(tour, req.body);
   toursData[tourIndex] = tour;
 
@@ -80,12 +77,6 @@ exports.updateTour = (req, res) => {
 
 exports.deleteTour = (req, res) => {
   const paramID = +req.params.id;
-
-  if (paramID > toursData.length) {
-    return res
-      .status(404)
-      .json({ status: 'fail', message: 'Invalid tour ID.' });
-  }
 
   // INSERT MODIFICATION LOGIC (TOUR REMOVAL)
   res.status(204).json({
