@@ -9,12 +9,18 @@ const userRouter = require('./routes/userRoutes');
 // ++++++++++++++++++++
 // ++++ Middleware ++++
 // ++++++++++++++++++++
-app.use(morgan('dev'));
+
+//Checks if we are in dev or production. Only runs when in Development
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
 app.use(express.json()); //Middleware - Function that can modify incoming request data.
 
+app.use(express.static(`${__dirname}/public`)); // For serving static files in public directory
+
 app.use((req, res, next) => {
-  console.log('Hello from the middlewar 🤭');
+  console.log('Hello from the middleware 🤭');
 
   next();
 });

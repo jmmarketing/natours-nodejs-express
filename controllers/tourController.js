@@ -12,6 +12,19 @@ exports.checkID = (req, res, next, val) => {
       .status(404)
       .json({ status: 'fail', message: 'Invalid tour ID.' });
   }
+
+  next();
+};
+exports.checkBody = (req, res, next) => {
+  const { name, price } = req.body;
+  if (!name || !price) {
+    return res.status(400).json({
+      status: 'Bad Request',
+      message: 'Missing tour details',
+    });
+  }
+
+  next();
 };
 
 exports.getAllTours = (req, res) => {
