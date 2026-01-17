@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const toursData = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
+  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`),
 );
 
 // <<<<<<<<< TOUR ROUTE HANDLERS/CONTROLLERS >>>>>>>>>
@@ -41,7 +41,7 @@ exports.getAllTours = (req, res) => {
 exports.getTour = (req, res) => {
   const paramID = +req.params.id;
 
-  const tour = toursData.find((t) => t.id == paramID);
+  const tour = toursData.find((t) => t.id === paramID);
   res.status(200).json({
     status: 'success',
     data: {
@@ -60,14 +60,14 @@ exports.createTour = (req, res) => {
     JSON.stringify(toursData),
     (err) => {
       res.status(201).json({ status: 'success', data: { tour: newTour } });
-    }
+    },
   );
 };
 
 exports.updateTour = (req, res) => {
   const paramID = +req.params.id;
-  const tour = toursData.find((t) => t.id == paramID);
-  const tourIndex = toursData.findIndex((t) => t.id == paramID);
+  const tour = toursData.find((t) => t.id === paramID);
+  const tourIndex = toursData.findIndex((t) => t.id === paramID);
 
   Object.assign(tour, req.body);
   toursData[tourIndex] = tour;
@@ -84,7 +84,7 @@ exports.updateTour = (req, res) => {
     JSON.stringify(toursData),
     (err) => {
       res.status(201).json({ status: 'success', data: { tour } });
-    }
+    },
   );
 };
 

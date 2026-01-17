@@ -4,7 +4,7 @@
   "description": "Project to revisit node and express. Practice.",
   "main": "app.js",
   "scripts": {
-    "start:dev": "nodemon server.js",
+    "start": "nodemon server.js",
     "start:prod": "SET NODE_ENV=production&&nodemon server.js"
   },
   "repository": {
@@ -20,6 +20,7 @@
   "dependencies": {
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "mongoose": "^8.21.0",
     "morgan": "^1.10.1"
   },
   "devDependencies": {
