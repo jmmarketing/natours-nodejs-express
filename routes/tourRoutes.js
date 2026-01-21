@@ -16,9 +16,12 @@ const router = express.Router();
 
 // ########### TOUR ROUTES ##########
 //Param middleware. Will only run when a parameter of 'id' is in the request path.
-router.param('id', checkID);
+// router.param('id', checkID);
 
-router.route('/').get(getAllTours).post(checkBody, createTour);
+//Example of chained controllers.
+// router.route('/').get(getAllTours).post(checkBody, createTour);
+
+router.route('/').get(getAllTours).post(createTour);
 
 router.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
 
