@@ -1,8 +1,10 @@
 const fs = require('fs');
+const Tour = require('../models/tourModel');
 
-const toursData = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`),
-);
+// Example for testing purposes.
+// const toursData = JSON.parse(
+//   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`),
+// );
 
 // <<<<<<<<< TOUR ROUTE HANDLERS/CONTROLLERS >>>>>>>>>
 exports.checkID = (req, res, next, val) => {
@@ -31,17 +33,17 @@ exports.getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
     requestedAt: req.requestedTime,
-    results: toursData.length,
-    data: {
-      tours: toursData,
+    // results: toursData.length,
+    // data: {
+    //   tours: toursData,
     },
   });
 };
 
 exports.getTour = (req, res) => {
-  const paramID = +req.params.id;
+  // const paramID = +req.params.id;
+  // const tour = toursData.find((t) => t.id === paramID);
 
-  const tour = toursData.find((t) => t.id === paramID);
   res.status(200).json({
     status: 'success',
     data: {
@@ -51,45 +53,28 @@ exports.getTour = (req, res) => {
 };
 
 exports.createTour = (req, res) => {
-  const newId = toursData[toursData.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
+  // const newId = toursData[toursData.length - 1].id + 1;
+  // const newTour = Object.assign({ id: newId }, req.body);
 
-  toursData.push(newTour);
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(toursData),
-    (err) => {
-      res.status(201).json({ status: 'success', data: { tour: newTour } });
-    },
-  );
+  res.status(201).json({
+    status: 'success',
+    // data: { tour: newTour }
+  });
 };
 
 exports.updateTour = (req, res) => {
-  const paramID = +req.params.id;
-  const tour = toursData.find((t) => t.id === paramID);
-  const tourIndex = toursData.findIndex((t) => t.id === paramID);
+  // const paramID = +req.params.id;
+  // const tour = toursData.find((t) => t.id === paramID);
+  // const tourIndex = toursData.findIndex((t) => t.id === paramID);
 
-  Object.assign(tour, req.body);
-  toursData[tourIndex] = tour;
+  // Object.assign(tour, req.body);
+  // toursData[tourIndex] = tour;
 
-  /* If PUT request, we would use someting like this..
-  toursData[tourIndex] = {
-            id: paramID,
-            ...req.body  
-  }
-  */
-
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(toursData),
-    (err) => {
-      res.status(201).json({ status: 'success', data: { tour } });
-    },
-  );
+  res.status(201).json({ status: 'success', data: { tour } });
 };
 
 exports.deleteTour = (req, res) => {
-  const paramID = +req.params.id;
+  // const paramID = +req.params.id;
 
   // INSERT MODIFICATION LOGIC (TOUR REMOVAL)
   res.status(204).json({
