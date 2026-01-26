@@ -39,6 +39,7 @@ const deleteData = async () => {
   process.exit();
 };
 
+//Runs via 'node dev-data/data/import-dev-data.js --import || --delete" -> process.argv hold the --flag
 if (process.argv[2] == '--import') {
   importData();
 } else if (process.argv[2] == '--delete') {

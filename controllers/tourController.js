@@ -1,3 +1,4 @@
+const { json } = require('express');
 const Tour = require('../models/tourModel');
 
 // Example for testing purposes.
@@ -33,7 +34,32 @@ const Tour = require('../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
   try {
-    const toursData = await Tour.find();
+    //1.) Filter out excluded Fields
+    //Express has a .query method that will put all req queries in a object
+    //Note: queryObj = req.query is pass by reference, so if you change queryObj you change the main req.query. Need to hard copy with spread.
+    const queryObj = { ...req.query };
+
+    //Some Queries we do not want to use for filtering in our search. These are UI related
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+
+    //Loops through and deletes these queries from our req.query object
+    excludedFields.forEach((field) => delete queryObj[field]);
+    console.log(req.query);
+
+    //1a.) Advanced fields consideration (less than, greater than, etc..)
+    console.log(queryObj);
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    console.log(JSON.parse(queryStr));
+
+    //2.) Start building the query (NOT executing yet)
+    const query = Tour.find(queryObj);
+
+    //3.) Add your conditions
+    //Here wwe can chain methods to query because a Query class (mongoose) is returned.
+
+    //4.) Execute full-built query
+    const toursData = await query;
 
     res.status(200).json({
       status: 'success',

@@ -1,14 +1,18 @@
 const express = require('express');
 const morgan = require('morgan');
 
-const app = express();
-
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+
+const qs = require('qs');
+
+const app = express();
 
 // ++++++++++++++++++++
 // ++++ Middleware ++++
 // ++++++++++++++++++++
+//Sets custom query parser using qs -- so /?difficulty[gt]=5 gets parsed to {difficulty: {gt: 5}}
+app.set('query parser', 'extended');
 
 //Checks if we are in dev or production. Only runs when in Development
 if (process.env.NODE_ENV === 'development') {
