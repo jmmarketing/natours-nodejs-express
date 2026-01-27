@@ -1,5 +1,6 @@
 const { json } = require('express');
 const Tour = require('../models/tourModel');
+const { listenerCount } = require('../app');
 
 // Example for testing purposes.
 // const toursData = JSON.parse(
@@ -47,16 +48,31 @@ exports.getAllTours = async (req, res) => {
     console.log(req.query);
 
     //1a.) Advanced fields consideration (less than, greater than, etc..)
-    console.log(queryObj);
+    // console.log(queryObj);
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-    console.log(JSON.parse(queryStr));
+    // console.log(JSON.parse(queryStr));
 
     //2.) Start building the query (NOT executing yet)
-    const query = Tour.find(queryObj);
+    let query = Tour.find(JSON.parse(queryStr));
 
     //3.) Add your conditions
     //Here wwe can chain methods to query because a Query class (mongoose) is returned.
+    //3a.) Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
+
+    //3b.) Field Limits
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = select('-__v');
+    }
 
     //4.) Execute full-built query
     const toursData = await query;
