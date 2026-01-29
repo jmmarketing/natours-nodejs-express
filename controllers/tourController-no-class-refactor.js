@@ -48,18 +48,21 @@ exports.aliasTopTours = (req, res, next) => {
 };
 
 class APIFeatures {
-  // query from mongoose, queryString from express
   constructor(query, queryString) {
     this.query = query;
     this.queryString = queryString;
   }
 
-  filter() {
-    console.log(this.queryString);
-    //Filter out excluded Fields
+  filter() {}
+}
+
+exports.getAllTours = async (req, res) => {
+  try {
+    console.log(req.query);
+    //1.) Filter out excluded Fields
     //Express has a .query method that will put all req queries in a object
     //Note: queryObj = req.query is pass by reference, so if you change queryObj you change the main req.query. Need to hard copy with spread.
-    const queryObj = { ...this.queryString };
+    const queryObj = { ...req.query };
 
     //Some Queries we do not want to use for filtering in our search. These are UI related
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
@@ -72,57 +75,43 @@ class APIFeatures {
     // console.log(queryObj);
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    // console.log(JSON.parse(queryStr));
 
-    this.query = this.query.find(JSON.parse(queryStr));
+    //2.) Start building the query (NOT executing yet)
+    let query = Tour.find(JSON.parse(queryStr));
 
-    return this;
-  }
-
-  sort() {
-    // Sorting
-    if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split(',').join(' ');
-      this.query = this.query.sort(sortBy);
+    //3.) Add your conditions
+    //Here wwe can chain methods to query because a Query class (mongoose) is returned.
+    //3a.) Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
     } else {
-      this.query = this.query.sort('-createdAt');
+      query = query.sort('-createdAt');
     }
 
-    return this;
-  }
-
-  limitFields() {
-    // Field Limits (Projection)
-    if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(',').join(' ');
-      this.query = this.query.select(fields);
+    //3b.) Field Limits (Projection)
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
     } else {
-      this.query = this.query.select('-__v');
+      query = query.select('-__v');
     }
-    return this;
-  }
 
-  paginate() {
-    //Pagination & limits
-    const page = +this.queryString.page || 1;
-    const limit = +this.queryString.limit || 10;
+    //3c.) Pagination & limits
+    const page = +req.query.page || 1;
+    const limit = +req.query.limit || 10;
     const skip = (page - 1) * limit;
 
-    this.query = this.query.skip(skip).limit(limit);
+    query = query.skip(skip).limit(limit);
 
-    return this;
-  }
-}
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) throw new Error('This page does not exist');
+    }
 
-exports.getAllTours = async (req, res) => {
-  try {
-    //Tour.find creates the Mongoose Query, req.query is the express query string
-    const features = new APIFeatures(Tour.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
-
-    const toursData = await features.query;
+    //4.) Execute full-built query
+    const toursData = await query;
 
     res.status(200).json({
       status: 'success',
