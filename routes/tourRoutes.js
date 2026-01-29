@@ -9,6 +9,7 @@ const {
   deleteTour,
   checkID,
   checkBody,
+  aliasTopTours,
 } = tourController;
 
 const router = express.Router();
@@ -20,6 +21,7 @@ const router = express.Router();
 
 //Example of chained controllers.
 // router.route('/').get(getAllTours).post(checkBody, createTour);
+router.route('/top-5-cheap').get(aliasTopTours, getAllTours);
 
 router.route('/').get(getAllTours).post(createTour);
 

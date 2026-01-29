@@ -1,6 +1,4 @@
-const { json } = require('express');
 const Tour = require('../models/tourModel');
-const { listenerCount } = require('../app');
 
 // Example for testing purposes.
 // const toursData = JSON.parse(
@@ -32,9 +30,35 @@ const { listenerCount } = require('../app');
 
 //   next();
 // };
+exports.aliasTopTours = (req, res, next) => {
+  const queryParams = new URLSearchParams({
+    limit: '5',
+    sort: '-ratingsAverage,price',
+    fields: 'name,price,ratingsAverage,summary,difficulty',
+  });
+
+  const seperator = req.url.includes('?') ? '&' : '?';
+  req.url = req.url + seperator + queryParams.toString();
+
+  //Bare bones simplist way - make a string and assing to url
+  // req.url =
+  //   '/?sort=-ratingsAverage,price&fields=ratingsAverage,price,name,difficulty,summary&limit=5';
+
+  next();
+};
+
+class APIFeatures {
+  constructor(query, queryString) {
+    this.query = query;
+    this.queryString = queryString;
+  }
+
+  filter() {}
+}
 
 exports.getAllTours = async (req, res) => {
   try {
+    console.log(req.query);
     //1.) Filter out excluded Fields
     //Express has a .query method that will put all req queries in a object
     //Note: queryObj = req.query is pass by reference, so if you change queryObj you change the main req.query. Need to hard copy with spread.
@@ -45,7 +69,7 @@ exports.getAllTours = async (req, res) => {
 
     //Loops through and deletes these queries from our req.query object
     excludedFields.forEach((field) => delete queryObj[field]);
-    console.log(req.query);
+    // console.log(req.query);
 
     //1a.) Advanced fields consideration (less than, greater than, etc..)
     // console.log(queryObj);
@@ -66,12 +90,24 @@ exports.getAllTours = async (req, res) => {
       query = query.sort('-createdAt');
     }
 
-    //3b.) Field Limits
+    //3b.) Field Limits (Projection)
     if (req.query.fields) {
       const fields = req.query.fields.split(',').join(' ');
       query = query.select(fields);
     } else {
-      query = select('-__v');
+      query = query.select('-__v');
+    }
+
+    //3c.) Pagination & limits
+    const page = +req.query.page || 1;
+    const limit = +req.query.limit || 10;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) throw new Error('This page does not exist');
     }
 
     //4.) Execute full-built query
