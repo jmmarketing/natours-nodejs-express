@@ -1,36 +1,6 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures');
 
-// Example for testing purposes.
-// const toursData = JSON.parse(
-//   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`),
-// );
-
-// <<<<<<<<< TOUR ROUTE HANDLERS/CONTROLLERS >>>>>>>>>
-//Example used for Middleware, using simple ID. Mongo has own ids.
-// exports.checkID = (req, res, next, val) => {
-//   console.log(`Tour id: ${val}`);
-//   if (val > toursData.length) {
-//     return res
-//       .status(404)
-//       .json({ status: 'fail', message: 'Invalid tour ID.' });
-//   }
-
-//   next();
-// };
-
-// Example middleware to validate body, but mongoose schema/model can handle validation of req.
-// exports.checkBody = (req, res, next) => {
-//   const { name, price } = req.body;
-//   if (!name || !price) {
-//     return res.status(400).json({
-//       status: 'Bad Request',
-//       message: 'Missing tour details',
-//     });
-//   }
-
-//   next();
-// };
 exports.aliasTopTours = (req, res, next) => {
   const queryParams = new URLSearchParams({
     limit: '5',
@@ -40,10 +10,6 @@ exports.aliasTopTours = (req, res, next) => {
 
   const seperator = req.url.includes('?') ? '&' : '?';
   req.url = req.url + seperator + queryParams.toString();
-
-  //Bare bones simplist way - make a string and assing to url
-  // req.url =
-  //   '/?sort=-ratingsAverage,price&fields=ratingsAverage,price,name,difficulty,summary&limit=5';
 
   next();
 };
@@ -141,6 +107,58 @@ exports.deleteTour = async (req, res) => {
     res.status(204).json({
       status: 'success',
       data: null,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getTourStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          // _id: { $toUpper: '$difficulty' },
+          _id: '$difficulty',
+          numTours: { $sum: 1 },
+          numRatings: { $sum: '$ratingsQuantity' },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+      {
+        $sort: { avgPrice: 1 },
+      },
+      // {
+      //   $match: { _id: { $ne: 'EASY' } },
+      // },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: stats,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    res.status(200).json({
+      status: 'success',
+      data: stats,
     });
   } catch (err) {
     res.status(404).json({
