@@ -23,11 +23,11 @@ app.use(express.json()); //Middleware - Function that can modify incoming reques
 
 app.use(express.static(`${__dirname}/public`)); // For serving static files in public directory
 
-app.use((req, res, next) => {
-  console.log('Hello from the middleware 🤭');
+// app.use((req, res, next) => {
+//   console.log('Hello from the middleware 🤭');
 
-  next();
-});
+//   next();
+// });
 
 app.use((req, res, next) => {
   req.requestedTime = new Date().toISOString();
@@ -41,5 +41,16 @@ app.use((req, res, next) => {
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+
+// ++++++++++++++++++++++++++++++++++++++
+// ++++ Unhandle Route Error Handler ++++
+// ++++++++++++++++++++++++++++++++++++++
+
+app.all('/{*wildcard}', (req, res, next) => {
+  res.status(404).json({
+    status: 'fail',
+    message: `Can't find ${req.originalUrl} on this server!`,
+  });
+});
 
 module.exports = app;
