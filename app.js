@@ -45,11 +45,29 @@ app.use('/api/v1/users', userRouter);
 // ++++++++++++++++++++++++++++++++++++++
 // ++++ Unhandle Route Error Handler ++++
 // ++++++++++++++++++++++++++++++++++++++
+//Should always be last since app.js runs in order.
 
 app.all('/{*wildcard}', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Can't find ${req.originalUrl} on this server!`,
+  // res.status(404).json({
+  //   status: 'fail',
+  //   message: `Can't find ${req.originalUrl} on this server!`,
+  // });
+
+  const err = new Error(`Can't find ${req.originalUrl} on this server!`);
+  err.status = 'fail';
+  err.statusCode = 404;
+
+  next(err);
+});
+
+//Express error handling middleware always takes 4 arguments, starting with error.
+app.use((err, req, res, next) => {
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || 'Error';
+
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message,
   });
 });
 
