@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures');
+const catchAsync = require('./../utils/catchAsync');
 
 exports.aliasTopTours = (req, res, next) => {
   const queryParams = new URLSearchParams({
@@ -14,32 +15,30 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
-exports.getAllTours = async (req, res) => {
-  try {
-    //Tour.find creates the Mongoose Query, req.query is the express query string
-    const features = new APIFeatures(Tour.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
+exports.getAllTours = catchAsync(async (req, res) => {
+  //Tour.find creates the Mongoose Query, req.query is the express query string
+  const features = new APIFeatures(Tour.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
 
-    const toursData = await features.query;
+  const toursData = await features.query;
 
-    res.status(200).json({
-      status: 'success',
-      // requestedAt: req.requestedTime,
-      results: toursData.length,
-      data: {
-        tours: toursData,
-      },
-    });
-  } catch (err) {
-    res.status(404).json({
-      stats: 'fail',
-      message: err,
-    });
-  }
-};
+  res.status(200).json({
+    status: 'success',
+    // requestedAt: req.requestedTime,
+    results: toursData.length,
+    data: {
+      tours: toursData,
+    },
+  });
+  // } catch (err) {
+  //   res.status(404).json({
+  //     stats: 'fail',
+  //     message: err,
+  //   });
+});
 
 exports.getTour = async (req, res) => {
   // const paramID = +req.params.id;
