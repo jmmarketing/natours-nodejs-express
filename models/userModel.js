@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
   {
@@ -27,19 +28,24 @@ const userSchema = new mongoose.Schema(
       required: [true, 'A passwored is required'],
       minLength: [8, 'Password must be a minimum of 8 characters'],
     },
-    passwordConfirmm: {
+    passwordConfirm: {
       type: String,
+      required: [true, 'You must confirm your password'],
       validate: {
+        //This only works on CREATE and SAVE!
         validator: function (val) {
           return val === this.password;
         },
         message: 'Passwords much match. ',
       },
-      required: [true, 'You must confirm your password'],
     },
   },
-  { toJSON: { virtuals: true }, toObject: { virtuals: true } },
+  { toJSON: { virtuals: true }, toObject: { virtuals: true }, id: false },
 );
+
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password')) return next();
+});
 
 const User = mongoose.model('User', userSchema);
 
