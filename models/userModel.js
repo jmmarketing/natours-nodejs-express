@@ -43,8 +43,17 @@ const userSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true }, id: false },
 );
 
-userSchema.pre('save', function (next) {
+userSchema.pre('save', async function (next) {
+  // Flag to for only running when password is modified.
   if (!this.isModified('password')) return next();
+
+  //bcrypt hash is asynchornous so need async/await
+  this.password = await bcrypt.hash(this.password, 12);
+
+  // Only needed to confirm the password entered, then we can remove it before saving. Not required to be persistned to the database
+  this.passwordConfirm = undefined;
+
+  next();
 });
 
 const User = mongoose.model('User', userSchema);
