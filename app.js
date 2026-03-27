@@ -33,6 +33,7 @@ app.use(express.static(`${__dirname}/public`)); // For serving static files in p
 
 app.use((req, res, next) => {
   req.requestedTime = new Date().toISOString();
+  console.log(req.headers);
 
   next();
 });
