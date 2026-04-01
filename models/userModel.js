@@ -92,8 +92,10 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 
 //Used from the forgotPassword in authController
 userSchema.methods.createPasswordResetToken = function () {
-  //Will be sent to user - toString is buffer.toString from node
+  //Will be sent to user - toString is buffer.toString from node - looks like: 3075627e3cbffefb06a34e4f0fc12d10adc8e79f9ae62113ac9ad17fe5333926
   const resetToken = crypto.randomBytes(32).toString('hex');
+
+  //Takes token and creates encrypted has to look like this: 8baf3a7701563f543b9177bc979b6aea14180c32e5d47a47ab9913c9fd832b5b - And is stored on Document.
   this.passwordResetToken = crypto
     .createHash('sha256')
     .update(resetToken)
