@@ -68,6 +68,15 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+//Update changedPasswordAt middleware.
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  //For lag we remove 1 second so Token is always after password has changed.
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
 //Instance method - will applied to all documents using the userSchema and ccan be called.
 userSchema.methods.correctPassword = async function (
   candidatePassword,
