@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -24,12 +25,6 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json()); //Middleware - Function that can modify incoming request data.
 
 app.use(express.static(`${__dirname}/public`)); // For serving static files in public directory
-
-// app.use((req, res, next) => {
-//   console.log('Hello from the middleware 🤭');
-
-//   next();
-// });
 
 app.use((req, res, next) => {
   req.requestedTime = new Date().toISOString();
