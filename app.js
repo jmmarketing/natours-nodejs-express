@@ -12,7 +12,7 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 // ++++++++++++++++++++
-// ++++ Middleware ++++
+// ++++ GLOBAL Middleware ++++
 // ++++++++++++++++++++
 //Sets custom query parser using qs -- so /?difficulty[gt]=5 gets parsed to {difficulty: {gt: 5}}
 app.set('query parser', 'extended');
@@ -21,6 +21,14 @@ app.set('query parser', 'extended');
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+const limiter = rateLimit({
+  limit: 100,
+  windowMs: 60 * 60 * 1000, // 1hr window
+  message: 'Too many requests, please try again in an hour',
+});
+
+app.use('/api', limiter); // Limits only API routes.
 
 app.use(express.json()); //Middleware - Function that can modify incoming request data.
 
