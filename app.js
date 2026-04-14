@@ -2,6 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('@exortek/express-mongo-sanitize');
+const { xss } = require('express-xss-sanitizer');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -38,6 +40,12 @@ app.use('/api', limiter); // Limits only API routes.
 
 // Body Parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' })); //Middleware - Function that can modify incoming request data.
+
+//Data Sanitization against NoSQL query injection
+app.use(mongoSanitize()); //looks at req and filters out $.
+
+//Data sanitization against cross site scripting (xss) attacks.
+app.use(xss()); //cleans req with any html code by converting symbols.
 
 app.use(express.static(`${__dirname}/public`)); // For serving static files in public directory
 

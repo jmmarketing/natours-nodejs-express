@@ -19,10 +19,12 @@
   },
   "homepage": "https://github.com/jmmarketing/natours-nodejs-express.git/#readme",
   "dependencies": {
+    "@exortek/express-mongo-sanitize": "^2.0.2",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.2",
+    "express-xss-sanitizer": "^2.0.2",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.21.0",
