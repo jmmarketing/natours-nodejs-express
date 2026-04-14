@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -14,6 +15,10 @@ const app = express();
 // ++++++++++++++++++++
 // ++++ GLOBAL Middleware ++++
 // ++++++++++++++++++++
+
+//Set Security HTTP Headers
+app.use(helmet());
+
 //Sets custom query parser using qs -- so /?difficulty[gt]=5 gets parsed to {difficulty: {gt: 5}}
 app.set('query parser', 'extended');
 
@@ -22,6 +27,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// Rate Limit requests
 const limiter = rateLimit({
   limit: 100,
   windowMs: 60 * 60 * 1000, // 1hr window
@@ -30,10 +36,12 @@ const limiter = rateLimit({
 
 app.use('/api', limiter); // Limits only API routes.
 
-app.use(express.json()); //Middleware - Function that can modify incoming request data.
+// Body Parser, reading data from body into req.body
+app.use(express.json({ limit: '10kb' })); //Middleware - Function that can modify incoming request data.
 
 app.use(express.static(`${__dirname}/public`)); // For serving static files in public directory
 
+//Test Middleware
 app.use((req, res, next) => {
   req.requestedTime = new Date().toISOString();
   // console.log(req.headers);
