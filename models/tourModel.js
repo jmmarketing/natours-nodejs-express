@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
+const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -84,6 +85,31 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      //GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: Array,
   },
   {
     toJSON: { virtuals: true },
@@ -91,7 +117,7 @@ const tourSchema = new mongoose.Schema(
   },
 );
 
-//Document Middleware Runs before the .save() and .create()
+//DOCUMENT MIDDLEWARE Runs before the .save() and .create()
 tourSchema.pre('save', function (next) {
   //This = currenlty processed document.
   // const slug = this.name.trim().split(' ').join('-');
@@ -99,6 +125,16 @@ tourSchema.pre('save', function (next) {
   next();
 });
 
+// Document MIDDLEWARE - Grabs IDs, finds user, and embeds into tourDocument before SAVE/CREATE Only.
+tourSchema.pre('save', async function (next) {
+  // Result of map is an array of promises.
+  const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+
+  // This will return the guides info when all promises resolve.
+  this.guides = await Promise.all(guidesPromises);
+
+  next();
+});
 //Reference for Post middleware (hook).
 // tourSchema.post('save', function (doc, next) {
 //   console.log(doc);
