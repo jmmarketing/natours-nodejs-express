@@ -45,7 +45,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   // const paramID = +req.params.id;
   // const tour = toursData.find((t) => t.id === paramID);
 
-  const tour = await Tour.findById(req.params.id);
+  const tour = await Tour.findById(req.params.id).populate('guides');
   //Tour.findOne({_id: req.params.id}) -- same result as above.
 
   if (!tour) {
