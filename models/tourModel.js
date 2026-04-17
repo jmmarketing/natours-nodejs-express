@@ -149,6 +149,7 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
+// For populating user references in guides field
 tourSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'guides',
