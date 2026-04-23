@@ -1,11 +1,30 @@
 //Get All Reviews
 //Create Review
 
-const Review = require('../models/reviewModel');
+const Reviews = require('../models/reviewModel');
 const AppError = require('../utils/appError');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
 
-exports.getAllReview = catchAsync(async (req, res, next) => {});
+exports.getAllReviews = catchAsync(async (req, res, next) => {
+  const reviewData = await Reviews.find();
 
-exports.createReview = catchAsync(async (req, res, next) => {});
+  res.status(200).json({
+    status: 'Success',
+    results: reviewData.length,
+    data: {
+      reviews: reviewData,
+    },
+  });
+});
+
+exports.createReview = catchAsync(async (req, res, next) => {
+  const newReview = await Reviews.create(req.body);
+
+  res.status(201).json({
+    stauts: 'success',
+    data: {
+      review: newReview,
+    },
+  });
+});
