@@ -10,7 +10,7 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   const reviewData = await Reviews.find();
 
   res.status(200).json({
-    status: 'Success',
+    status: 'success',
     results: reviewData.length,
     data: {
       reviews: reviewData,
